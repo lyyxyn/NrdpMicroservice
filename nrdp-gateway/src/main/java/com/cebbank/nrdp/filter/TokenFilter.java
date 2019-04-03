@@ -22,6 +22,7 @@ public class TokenFilter extends ZuulFilter {
 		RequestContext currentContext = RequestContext.getCurrentContext();
 		HttpServletRequest request = currentContext.getRequest();
 		System.out.println(String.format("send %s request to %s",request.getMethod(),request.getRequestURL().toString()));
+<<<<<<< HEAD
 //		String userToken = request.getParameter("token");
 //		if (StringUtils.isEmpty(userToken)) {
 //			currentContext.setSendZuulResponse(false);
@@ -29,6 +30,15 @@ public class TokenFilter extends ZuulFilter {
 //			currentContext.setResponseBody("userToken is null");
 //			return null;
 //		}
+=======
+		String userToken = request.getParameter("token");
+		if (StringUtils.isEmpty(userToken)) {
+			currentContext.setSendZuulResponse(false);
+			currentContext.setResponseStatusCode(401);
+			currentContext.setResponseBody("userToken is null");
+			return null;
+		}
+>>>>>>> 73aa14fb423c0048593bdc018524e5c9df387147
 		try{
 			int i=1;
 			int a=i/0;
