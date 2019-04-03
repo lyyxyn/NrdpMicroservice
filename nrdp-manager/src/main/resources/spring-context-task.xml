@@ -1,0 +1,34 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+
+    <!-- 配置任务执行器 -->
+    <task:executor id="executor" pool-size="5" />
+    <!-- 配置任务调度器 -->
+    <task:scheduler id="scheduler" pool-size="5" />
+    <!--
+        开启定时器开关，自动扫描程序中带注解的定时器。proxy-target-class属性决定是基于接口的还是基于类的代理被创建。
+        true则是基于类的代理将起作用（需要glib库），为false或者省略这个属性。
+    -->
+    <task:annotation-driven executor="executor" scheduler="scheduler" proxy-target-class="true" />
+    <!-- 配置调度器调度的任务,注:只要类被加载到spring容器中，就能调度，所以不用在乎类上需要加什么注解 -->
+    <task:scheduled-tasks scheduler="scheduler">
+        <task:scheduled ref="kinitTask" method="doKerberosInit" fixed-delay="3600000" initial-delay="1000" />
+        <task:scheduled ref="heartBeatTask" method="sendHeartBeat" fixed-delay="300000" initial-delay="10" />
+        <task:scheduled ref="checkHBaseTablesStatusTask" method="checkHBaseTablesStatusAndSaveToRedis" fixed-delay="3600000" initial-delay="1000" />
+    </task:scheduled-tasks>
+
+    <!--
+        initial-delay:  表示第一次运行前需要延迟的时间，单位是毫秒
+        fixed-delay  :  表示从上一个任务完成到下一个任务开始的间隔, 单位是毫秒
+        fixed-rate   :  表示从上一个任务开始到下一个任务开始的间隔, 单位是毫秒（如果某次任务开始时上次任务还没有结束，那么在上次任务执行完成时，当前任务会立即执行）
+        cron         :  cron 表达式，由6个字段组成,依次为 second, minute, hour, day, month, weekday  例如:
+                        "0 0 * * * *"          = the top of every hour of every day.
+                        "*/10 * * * * *"       = every ten seconds.（在 0, 10, 20, 30, 40, 50 秒时运行）
+                        "0 0 8-10 * * *"       = 8, 9 and 10 o'clock of every day.
+                        "0 0/30 8-10 * * *"    = 8:00, 8:30, 9:00, 9:30, 10:00 and 10:30 o'clock every day.
+                        "0 0 9-17 * * MON-FRI" = on the hour nine-to-five weekdays
+                        "0 0 0 25 12 ?"        = every Christmas Day at midnight
+    -->
+</beans>
